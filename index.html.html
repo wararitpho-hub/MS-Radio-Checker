@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Import Checker</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f2f6ff; padding: 30px; }
+        .container { max-width: 500px; margin: auto; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h2 { text-align: center; margin-bottom: 20px; }
+        label { font-weight: bold; display: block; margin-top: 15px; }
+        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; }
+        button { width: 100%; padding: 12px; margin-top: 20px; background: #3a6cf4; color: white; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; }
+        #resultBox { margin-top: 20px; padding: 15px; border-radius: 8px; background: #eef3ff; display: none; }
+        .ok { color: green; font-weight: bold; }
+        .notok { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>ตรวจสอบการขอใบนำเข้าวิทยุ</h2>
+        <label>ประเภทอุปกรณ์</label>
+        <select id="device">
+            <option value="radio">เครื่องวิทยุ</option>
+            <option value="radio_device">อุปกรณ์เครื่องวิทยุ</option>
+        </select>
+        <label>Description Unit</label>
+        <input type="text" id="description" placeholder="กรอกชื่ออุปกรณ์" />
+        <button onclick="checkResult()">ตรวจสอบ</button>
+        <div id="resultBox"></div>
+    </div>
+    <script>
+        function checkResult() {
+            const description = document.getElementById('description').value.trim().toLowerCase();
+            const box = document.getElementById('resultBox');
+            let result = "";
+            let reason = "";
+
+            const mustHave = [
+                "g1000 integrated avionics unit", "avionics unit", "radar antenna", "antenna",
+                "vhf/gps antenna", "vhf/gps", "gia63", "gia63 w", "transponder", "gtx33", "gtx 33es", "kt76 c"
+            ];
+            const notRequired = [
+                "engine/airframe unit", "g1000 display unit", "audio panel",
+                "g1000 unit", "gud1040", "audio"
+            ];
+
+            if (mustHave.some(item => description.includes(item.toLowerCase()))) {
+                result = "✔ ต้องขอใบนำเข้า";
+                reason = `เข้าข่ายอุปกรณ์: ${description}`;
+            } else if (notRequired.some(item => description.includes(item.toLowerCase()))) {
+                result = "❌ ไม่ต้องขอใบนำเข้า";
+                reason = `ไม่เข้าข่ายอุปกรณ์: ${description}`;
+            } else {
+                result = "❗ ต้องตรวจสอบเพิ่มเติม";
+                reason = `อุปกรณ์นี้ไม่ได้อยู่ในฐานข้อมูล: ${description}`;
+            }
+
+            box.style.display = "block";
+            box.innerHTML = `<b>${result}</b><br>${reason}`;
+        }
+    </script>
+</body>
+</html>
